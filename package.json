@@ -4,10 +4,15 @@
   "author": "Creative Tim",
   "license": "MIT",
   "homepage": "https://demos.creative-tim.com/nextjs-argon-dashboard/",
+  "engines": {
+    "npm": "=6.14.12",
+    "node": "=14.16.1"
+  },
   "description": "NextJS version of Argon Dashboard React by Creative Tim",
   "bugs": {
     "url": "https://github.com/creativetimofficial/nextjs-argon-dashboard/issues"
   },
+  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/creativetimofficial/nextjs-argon-dashboard.git"
