@@ -8,7 +8,7 @@ import { Line, Bar } from "react-chartjs-2";
 import axios from 'axios'
 import Router from 'next/router';
 import { db } from "../../firebase-config";
-import {collection,getDocs,addDoc} from "firebase/firestore"
+import {collection,getDocs,addDoc,serverTimestamp,Timestamp} from "firebase/firestore"
 // reactstrap components
 import {
     Button,
@@ -47,7 +47,10 @@ const SendNotification = (props) => {
 
     const onSubmit = async (e) =>{
         e.preventDefault();
-        // console.log(description.target.value)
+        // const timestamp = Timestamp.fromDate(new Date());
+        const timestamp = Timestamp.fromDate(new Date());
+        // console.log(""+timestamp+"")
+        // return;
         const data = await getDocs(userCollectionRef)
         
         console.log(data)
@@ -73,7 +76,7 @@ const SendNotification = (props) => {
           'Access-Control-Allow-Credentials': 'true'
         }}).then(async (res)=>{
                 alert("Notification sent")
-                const refDoc =await addDoc(notificationCollectionRef,{message:newdescription || null,title:newtitle || null,url:newurl || null}).then((res) =>{
+                const refDoc =await addDoc(notificationCollectionRef,{message:newdescription || null,title:newtitle || null,url:newurl || null,timestamp:timestamp}).then((res) =>{
                     console.log("res")
                     console.log(res)
                     setTitle("")
@@ -89,7 +92,7 @@ const SendNotification = (props) => {
               console.log(res)
             }).catch(async err => {
               if(err.code === "ERR_NETWORK"){
-                const refDoc = await addDoc(notificationCollectionRef,{message:newdescription || null,title:newtitle || null,url:newurl || null}).then((res) =>{
+                const refDoc = await addDoc(notificationCollectionRef,{message:newdescription || null,title:newtitle || null,url:newurl || null,timestamp:timestamp}).then((res) =>{
                   console.log("res")
                   setTitle("")
                   setDescription("")

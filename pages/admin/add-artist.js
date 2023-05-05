@@ -1,322 +1,426 @@
-import React from "react";
+import React, {useState,useEffect} from "react";
 // node.js library that concatenates classes (strings)
 import classnames from "classnames";
 // javascipt plugin for creating charts
 import Chart from "chart.js";
 // react plugin used to create charts
 import { Line, Bar } from "react-chartjs-2";
+import axios from 'axios'
+import Router from 'next/router';
+import { db } from "../../firebase-config";
+import {collection,getDocs,addDoc,serverTimestamp,Timestamp} from "firebase/firestore"
 // reactstrap components
 import {
-  Button,
-  Card,
-  CardHeader,
-  CardBody,
-  NavItem,
-  NavLink,
-  Nav,
-  Progress,
-  Table,
-  Container,
-  Row,
-  Col,
-} from "reactstrap";
-// layout for this page
-import Admin from "layouts/Admin.js";
-// core components
-import {
-  chartOptions,
-  parseOptions,
-  chartExample1,
-  chartExample2,
-} from "variables/charts.js";
-
-import Header from "components/Headers/Header.js";
+    Button,
+    Card,
+    CardHeader,
+    CardBody,
+    FormGroup,
+    Form,
+    Input,
+    Container,
+    Row,
+    Col,
+  } from "reactstrap";
+  // layout for this page
+  import Admin from "layouts/Admin.js";
+  // core components
+  import UserHeader from "components/Headers/UserHeader.js";
 
 const AddArtist = (props) => {
-  const [activeNav, setActiveNav] = React.useState(1);
-  const [chartExample1Data, setChartExample1Data] = React.useState("data1");
+    const [bio,setBio] = useState("")
+    const [imgUrl,setImgUrl] = useState("")
+    const [name,setName] = useState("")
+    const [instaUrl,setInstaUrl] = useState("")
+    const [twitterUrl,setTwitterUrl] = useState("")
+    const [fbUrl,setFbUrl] = useState("")
+    const [snapchatUrl,setSnapchatUrl] = useState("")
+    const artistsCollectionRef = collection(db,"artists")
+    useEffect(() => {
+        const userLogged = localStorage.getItem("userLogin")
+        if(userLogged){
+            
+        }else{
+            Router.push("/")
+        }
+    },[])
 
-  if (window.Chart) {
-    parseOptions(Chart, chartOptions());
-  }
-
-  const toggleNavs = (e, index) => {
-    e.preventDefault();
-    setActiveNav(index);
-    setChartExample1Data("data" + index);
-  };
-  return (
-    <>
-      <Header />
-      {/* Page content */}
-      <Container className="mt--7" fluid>
-        <Row>
-          <Col className="mb-5 mb-xl-0" xl="8">
-            <Card className="shadow">
-              <CardHeader className="bg-transparent">
-                <Row className="align-items-center">
-                  <div className="col">
-                    <h6 className="text-uppercase text-light ls-1 mb-1">
-                      Overview
-                    </h6>
-                    <h2 className="text-white mb-0">Sales value</h2>
-                  </div>
-                  <div className="col">
-                    <Nav className="justify-content-end" pills>
-                      <NavItem>
-                        <NavLink
-                          className={classnames("py-2 px-3", {
-                            active: activeNav === 1,
-                          })}
+    const onSubmit = async (e) =>{
+        e.preventDefault();
+        const timestamp = Timestamp.fromDate(new Date());
+        await addDoc(artistsCollectionRef,{bio:bio || null,image_url:imgUrl || null,name:name || null,fb_url:fbUrl || null,insta_url:instaUrl || null,twitter_url:twitterUrl || null,snapchat_url:snapchatUrl || null,timestamp:timestamp}).then((res) =>{
+            alert("Added")
+            setBio("")
+            setImgUrl("")
+            setName("")
+            setInstaUrl("")
+            setTwitterUrl("")
+            setFbUrl("")
+            setSnapchatUrl("")
+        }).catch(err => console.log(err))
+    }
+  
+    return (
+        <>
+          <UserHeader />
+          {/* Page content */}
+          <Container className="mt--7" fluid>
+            <Row>
+              <Col className="order-xl-2 mb-5 mb-xl-0" xl="0">
+                {/* <Card className="card-profile shadow">
+                  <Row className="justify-content-center">
+                    <Col className="order-lg-2" lg="3">
+                      <div className="card-profile-image">
+                        <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                          <img
+                            alt="..."
+                            className="rounded-circle"
+                            src={require("assets/img/theme/team-4-800x800.jpg")}
+                          />
+                        </a>
+                      </div>
+                    </Col>
+                  </Row>
+                  <CardHeader className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
+                    <div className="d-flex justify-content-between">
+                      <Button
+                        className="mr-4"
+                        color="info"
+                        href="#pablo"
+                        onClick={(e) => e.preventDefault()}
+                        size="sm"
+                      >
+                        Connect
+                      </Button>
+                      <Button
+                        className="float-right"
+                        color="default"
+                        href="#pablo"
+                        onClick={(e) => e.preventDefault()}
+                        size="sm"
+                      >
+                        Message
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardBody className="pt-0 pt-md-4">
+                    <Row>
+                      <div className="col">
+                        <div className="card-profile-stats d-flex justify-content-center mt-md-5">
+                          <div>
+                            <span className="heading">22</span>
+                            <span className="description">Friends</span>
+                          </div>
+                          <div>
+                            <span className="heading">10</span>
+                            <span className="description">Photos</span>
+                          </div>
+                          <div>
+                            <span className="heading">89</span>
+                            <span className="description">Comments</span>
+                          </div>
+                        </div>
+                      </div>
+                    </Row>
+                    <div className="text-center">
+                      <h3>
+                        Jessica Jones
+                        <span className="font-weight-light">, 27</span>
+                      </h3>
+                      <div className="h5 font-weight-300">
+                        <i className="ni location_pin mr-2" />
+                        Bucharest, Romania
+                      </div>
+                      <div className="h5 mt-4">
+                        <i className="ni business_briefcase-24 mr-2" />
+                        Solution Manager - Creative Tim Officer
+                      </div>
+                      <div>
+                        <i className="ni education_hat mr-2" />
+                        University of Computer Science
+                      </div>
+                      <hr className="my-4" />
+                      <p>
+                        Ryan — the name taken by Melbourne-raised, Brooklyn-based
+                        Nick Murphy — writes, performs and records all of his own
+                        music.
+                      </p>
+                      <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                        Show more
+                      </a>
+                    </div>
+                  </CardBody>
+                </Card> */}
+              </Col>
+              <Col className="order-xl-1" xl="12">
+                <Card className="bg-secondary shadow">
+                  <CardHeader className="bg-white border-0">
+                    <Row className="align-items-center">
+                      <Col xs="8">
+                        <h3 className="mb-0">Add Artist Data</h3>
+                      </Col>
+                      {/* <Col className="text-right" xs="4">
+                        <Button
+                          color="primary"
                           href="#pablo"
-                          onClick={(e) => toggleNavs(e, 1)}
+                          onClick={(e) => e.preventDefault()}
+                          size="sm"
                         >
-                          <span className="d-none d-md-block">Month</span>
-                          <span className="d-md-none">M</span>
-                        </NavLink>
-                      </NavItem>
-                      <NavItem>
-                        <NavLink
-                          className={classnames("py-2 px-3", {
-                            active: activeNav === 2,
-                          })}
-                          data-toggle="tab"
-                          href="#pablo"
-                          onClick={(e) => toggleNavs(e, 2)}
-                        >
-                          <span className="d-none d-md-block">Week</span>
-                          <span className="d-md-none">W</span>
-                        </NavLink>
-                      </NavItem>
-                    </Nav>
-                  </div>
-                </Row>
-              </CardHeader>
-              <CardBody>
-                {/* Chart */}
-                <div className="chart">
-                  <Line
-                    data={chartExample1[chartExample1Data]}
-                    options={chartExample1.options}
-                    getDatasetAtEvent={(e) => console.log(e)}
-                  />
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-          <Col xl="4">
-            <Card className="shadow">
-              <CardHeader className="bg-transparent">
-                <Row className="align-items-center">
-                  <div className="col">
-                    <h6 className="text-uppercase text-muted ls-1 mb-1">
-                      Performance
-                    </h6>
-                    <h2 className="mb-0">Total orders</h2>
-                  </div>
-                </Row>
-              </CardHeader>
-              <CardBody>
-                {/* Chart */}
-                <div className="chart">
-                  <Bar
-                    data={chartExample2.data}
-                    options={chartExample2.options}
-                  />
-                </div>
-              </CardBody>
-            </Card>
-          </Col>
-        </Row>
-        <Row className="mt-5">
-          <Col className="mb-5 mb-xl-0" xl="8">
-            <Card className="shadow">
-              <CardHeader className="border-0">
-                <Row className="align-items-center">
-                  <div className="col">
-                    <h3 className="mb-0">Page visits</h3>
-                  </div>
-                  <div className="col text-right">
-                    <Button
-                      color="primary"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      See all
-                    </Button>
-                  </div>
-                </Row>
-              </CardHeader>
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                    <th scope="col">Page name</th>
-                    <th scope="col">Visitors</th>
-                    <th scope="col">Unique users</th>
-                    <th scope="col">Bounce rate</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">/argon/</th>
-                    <td>4,569</td>
-                    <td>340</td>
-                    <td>
-                      <i className="fas fa-arrow-up text-success mr-3" /> 46,53%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">/argon/index.html</th>
-                    <td>3,985</td>
-                    <td>319</td>
-                    <td>
-                      <i className="fas fa-arrow-down text-warning mr-3" />{" "}
-                      46,53%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">/argon/charts.html</th>
-                    <td>3,513</td>
-                    <td>294</td>
-                    <td>
-                      <i className="fas fa-arrow-down text-warning mr-3" />{" "}
-                      36,49%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">/argon/tables.html</th>
-                    <td>2,050</td>
-                    <td>147</td>
-                    <td>
-                      <i className="fas fa-arrow-up text-success mr-3" /> 50,87%
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">/argon/profile.html</th>
-                    <td>1,795</td>
-                    <td>190</td>
-                    <td>
-                      <i className="fas fa-arrow-down text-danger mr-3" />{" "}
-                      46,53%
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-            </Card>
-          </Col>
-          <Col xl="4">
-            <Card className="shadow">
-              <CardHeader className="border-0">
-                <Row className="align-items-center">
-                  <div className="col">
-                    <h3 className="mb-0">Social traffic</h3>
-                  </div>
-                  <div className="col text-right">
-                    <Button
-                      color="primary"
-                      href="#pablo"
-                      onClick={(e) => e.preventDefault()}
-                      size="sm"
-                    >
-                      See all
-                    </Button>
-                  </div>
-                </Row>
-              </CardHeader>
-              <Table className="align-items-center table-flush" responsive>
-                <thead className="thead-light">
-                  <tr>
-                    <th scope="col">Referral</th>
-                    <th scope="col">Visitors</th>
-                    <th scope="col" />
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th scope="row">Facebook</th>
-                    <td>1,480</td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <span className="mr-2">60%</span>
-                        <div>
-                          <Progress
-                            max="100"
-                            value="60"
-                            barClassName="bg-gradient-danger"
+                          Send Notification
+                        </Button>
+                      </Col> */}
+                    </Row>
+                  </CardHeader>
+                  <CardBody>
+                    <Form onSubmit={onSubmit}>
+                      <h6 className="heading-small text-muted mb-4">
+                        Artist information
+                      </h6>
+                      <div className="pl-lg-4">
+                        <Row>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-username"
+                              >
+                                Name
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                id="input-username"
+                                onChange={(e) => setName(e.target.value)}
+                                placeholder="Name"
+                                type="text"
+                                value={name}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-email"
+                              >
+                                Bio
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                id="input-email"
+                                placeholder="Bio"
+                                type="text"
+                                value={bio}
+                                onChange={(e) => setBio(e.target.value)}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-first-name"
+                              >
+                                Image URL
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                value={imgUrl}
+                                id="input-first-name"
+                                placeholder="Image URL (https://....)"
+                                type="text"
+                                onChange={(e) => setImgUrl(e.target.value)}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-last-name"
+                              >
+                                Instagram URL
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                value={instaUrl}
+                                id="input-last-name"
+                                placeholder="Instagram URL (https://....)"
+                                type="text"
+                                onChange={(e) => setInstaUrl(e.target.value)}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-last-name"
+                              >
+                                Facebook URL
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                value={fbUrl}
+                                id="input-last-name"
+                                placeholder="Instagram URL (https://....)"
+                                type="text"
+                                onChange={(e) => setFbUrl(e.target.value)}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-last-name"
+                              >
+                                Twitter URL
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                value={twitterUrl}
+                                id="input-last-name"
+                                placeholder="Twitter URL (https://....)"
+                                type="text"
+                                onChange={(e) => setTwitterUrl(e.target.value)}
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="6">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-last-name"
+                              >
+                                Snapchat URL
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                value={snapchatUrl}
+                                id="input-last-name"
+                                placeholder="Snapchat URL (https://....)"
+                                type="text"
+                                onChange={(e) => setSnapchatUrl(e.target.value)}
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row className="d-flex justify-content-center">
+                            <Col>
+                            <Button
+                                color="primary"
+                                type="submit"
+                                >
+                                Add Artist in Directory
+                            </Button>
+                            </Col>
+                        </Row>
+                      </div>
+                      {/* <hr className="my-4" /> */}
+                      {/* Address */}
+                      {/* <h6 className="heading-small text-muted mb-4">
+                        Contact information
+                      </h6> */}
+                      {/* <div className="pl-lg-4">
+                        <Row>
+                          <Col md="12">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-address"
+                              >
+                                Address
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
+                                id="input-address"
+                                placeholder="Home Address"
+                                type="text"
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                        <Row>
+                          <Col lg="4">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-city"
+                              >
+                                City
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                defaultValue="New York"
+                                id="input-city"
+                                placeholder="City"
+                                type="text"
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="4">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-country"
+                              >
+                                Country
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                defaultValue="United States"
+                                id="input-country"
+                                placeholder="Country"
+                                type="text"
+                              />
+                            </FormGroup>
+                          </Col>
+                          <Col lg="4">
+                            <FormGroup>
+                              <label
+                                className="form-control-label"
+                                htmlFor="input-country"
+                              >
+                                Postal code
+                              </label>
+                              <Input
+                                className="form-control-alternative"
+                                id="input-postal-code"
+                                placeholder="Postal code"
+                                type="number"
+                              />
+                            </FormGroup>
+                          </Col>
+                        </Row>
+                      </div> */}
+                      {/* <hr className="my-4" /> */}
+                      {/* Description */}
+                      {/* <h6 className="heading-small text-muted mb-4">About me</h6> */}
+                      {/* <div className="pl-lg-4">
+                        <FormGroup>
+                          <label>About Me</label>
+                          <Input
+                            className="form-control-alternative"
+                            placeholder="A few words about you ..."
+                            rows="4"
+                            defaultValue="A beautiful Dashboard for Bootstrap 4. It is Free and
+                              Open Source."
+                            type="textarea"
                           />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Facebook</th>
-                    <td>5,480</td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <span className="mr-2">70%</span>
-                        <div>
-                          <Progress
-                            max="100"
-                            value="70"
-                            barClassName="bg-gradient-success"
-                          />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Google</th>
-                    <td>4,807</td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <span className="mr-2">80%</span>
-                        <div>
-                          <Progress max="100" value="80" />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Instagram</th>
-                    <td>3,678</td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <span className="mr-2">75%</span>
-                        <div>
-                          <Progress
-                            max="100"
-                            value="75"
-                            barClassName="bg-gradient-info"
-                          />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">twitter</th>
-                    <td>2,645</td>
-                    <td>
-                      <div className="d-flex align-items-center">
-                        <span className="mr-2">30%</span>
-                        <div>
-                          <Progress
-                            max="100"
-                            value="30"
-                            barClassName="bg-gradient-warning"
-                          />
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </>
-  );
+                        </FormGroup>
+                      </div> */}
+                        
+                    </Form>
+                  </CardBody>
+                </Card>
+              </Col>
+            </Row>
+          </Container>
+        </>
+      );
 };
 
 AddArtist.layout = Admin;

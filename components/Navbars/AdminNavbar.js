@@ -62,7 +62,7 @@ function AdminNavbar({ brandText }) {
                 <DropdownItem className="noti-title" header tag="div">
                   <h6 className="text-overflow m-0">Welcome!</h6>
                 </DropdownItem>
-                <Link href="/admin/profile">
+                {/* <Link href="/admin/profile">
                   <DropdownItem>
                     <i className="ni ni-single-02" />
                     <span>My profile</span>
@@ -85,7 +85,7 @@ function AdminNavbar({ brandText }) {
                     <i className="ni ni-support-16" />
                     <span>Support</span>
                   </DropdownItem>
-                </Link>
+                </Link> */}
                 <DropdownItem divider />
                 <DropdownItem href="#pablo" onClick={(e) => {
                   e.preventDefault()
